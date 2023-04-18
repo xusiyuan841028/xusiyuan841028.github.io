@@ -3,21 +3,12 @@ outline: [2, 3]
 ---
 
 # TypeScript Utility Types 
-  
----------------------------------------
 
-<a href="https://www.typescriptlang.org/docs/handbook/release-notes/typescript-5-0.html" alt="TypeScript">
-  <img src="https://img.shields.io/badge/TypeScript-v5.0.4-blue?style=for-the-badge&logo=typescript" /></a>
+基于TypeScript 5.0.4, 梳理一下通用的Utility Types, 点评实现原理
 
----------------------------------------
-
-
-基于TypeScript 5.0.4, 梳理一下通用的Utility Types, 点评实现原理, 帮助大家加深对TypeScript类型运算的理解
-
-## 常用类型 {#common}
-
+## 常用类型
 ### **`Awaited<Type>`** {#awaited}
-拆解Promise类型, 获得Promise的返回值类型, 并且可以递归拆解, 直至返回类型中不再出现`Promise`类型
+简单说, 拆解Promise类型, 获得Promise的返回值类型, 且可以递归拆解
 
 #### 使用
 ```typescript
@@ -27,10 +18,7 @@ type C = Awaited<boolean | Promise<number>>;  // type C = number | boolean
 ```
 
 #### 源代码
-```typescript{6-8}
-/**
- * Recursively unwraps the "awaited type" of a type. Non-promise "thenables" should resolve to `never`. This emulates the behavior of `await`.
- */
+```typescript{3-5}
 type Awaited<T> =
     T extends null | undefined ? T : // special case for `null | undefined` when not in `--strictNullChecks` mode
         T extends object & { then(onfulfilled: infer F, ...args: infer _): any } ? // `await` only unwraps object types with a callable `then`. Non-object types are not unwrapped
@@ -87,10 +75,7 @@ type PartialTodo = {
 ```
 
 #### 源代码
-```typescript{5}
-/**
- * Make all properties in T optional
- */
+```typescript{2}
 type Partial<T> = {
     [P in keyof T]?: T[P];
 };
@@ -173,10 +158,7 @@ type RequiredProps = {
 ```
 
 #### 源代码
-```typescript{5}
-/**
- * Make all properties in T required
- */
+```typescript{2}
 type Required<T> = {
     [P in keyof T]-?: T[P];
 };
@@ -226,11 +208,8 @@ type ReadonlyTodo = {
 
 #### 源代码
 ```typescript
-/**
- * Make all properties in T readonly
- */
 type Readonly<T> = {
-    readonly [P in keyof T]: T[P];
+  readonly [P in keyof T]: T[P];
 };
 ```
 
@@ -259,10 +238,7 @@ const cats: Record<CatName, CatInfo> = {
 ```
 
 #### 源代码
-```typescript
-/**
- * Construct a type with a set of properties K of type T
- */
+```typescript{1}
 type Record<K extends keyof any, T> = {
     [P in K]: T;
 };
@@ -299,9 +275,6 @@ type TodoPreview = {
 
 #### 源代码
 ```typescript
-/**
- * From T, pick a set of properties whose keys are in the union K
- */
 type Pick<T, K extends keyof T> = {
     [P in K]: T[P];
 };
@@ -332,10 +305,7 @@ type TodoTitle = {
 ```
 
 #### 源代码
-```typescript
-/**
- * Construct a type with the properties of T except for those in type K.
- */
+```typescript{1}
 type Omit<T, K extends keyof any> = Pick<T, Exclude<keyof T, K>>;
 ```
 
@@ -353,10 +323,7 @@ type T0 = Exclude<"a" | "b" | "c", "a">;  // "b" | "c"
 ```
 
 #### 源代码
-```typescript
-/**
- * Exclude from T those types that are assignable to U
- */
+```typescript{1}
 type Exclude<T, U> = T extends U ? never : T;
 ```
 
@@ -366,7 +333,7 @@ type Exclude<T, U> = T extends U ? never : T;
 :::
 
 ::: tip
-利用`T | never` = `T` 的特性, 可以排除`U`类型
+利用`T | never` = `T` 的特性, 可以排除`U`的类型
 :::
 
 ### **`Extract<Type, Union>`** {#extract}
@@ -379,9 +346,6 @@ type T0 = Extract<"a" | "b" | "c", "a" | "f">;  // "a"
 
 #### 源代码
 ```typescript
-/**
- * Extract from T those types that are assignable to U
- */
 type Extract<T, U> = T extends U ? T : never;
 ```
 
@@ -400,69 +364,13 @@ type T0 = NonNullable<string | number | undefined | null>;  // string | number
 
 #### 源代码
 ```typescript
-type NonNullable<T> = T & {};
+type NonNullable<T> = T extends null | undefined ? never : T;
 ```
 
 #### 实现原理
 ::: tip
-这里着重解释一下`&`类型操作符, 也就是所谓的交集, 示例如下; 很多人最初不理解为啥A和B的交集类型是合并属性, 不是做交集么?  
-  
-实际上, 从集合论的观点, `A & B`生成的新类型是A和B的子集, 也就是A和B子类型, 或者说A包含AB且B包含AB  
-
-所以`AB extends A` `AB extends B`都是`true`, 那么当然要把`A`和`B`的属性都合并起来, 否则无法满足即是`A`的子集, 又是`B`的子集  
+其原理参考之前点评
 :::
-
-```typescript
-interface A {
-  a: string;
-}
-interface B {
-  b: string;
-}
-type AB = A & B;
-/*
-type AB = {
-  a: string;
-  b: string;
-}
-*/
-```
-  
-::: tip
-再看`NonNullable`的具体实现`T & {}`, 令:   
-  
-`T = string | number | null | undefined`     
-  
-那么:  
-  
-`T & {}` = `(string & {}) | (number & {}) | (null & {}) | (undefined & {})`  
-  
-上述运算的结果就是 `string | number`, 成功剔除`null`和`undefined`
-:::
-
-::: tip
-这里利用了`{}`类型的特殊之处, 所有类型都是`{}`类型的子类型, 除了`void` `null` `undefined`, 并且`{}`和这三个类型是互斥的, 不存在既是`null`又是`{}`(空对象)的类型, 可以参考以下代码  
-:::
-
-```typescript
-declare const neverValue: never;
-declare const voidValue: void;
-let v: {} = {};
-
-v = neverValue;   // 记住: 右值类型永远是左值类型的子类型!
-v = 2;
-v = { a: 'c', b: 1 };
-v = true;
-
-v = voidValue;    // ERROR
-v = null;         // ERROR
-v = undefined;    // ERROR
-
-type Never1 = null & {};      // never
-type Never2 = undefined & {}; // never
-type Never3 = void & {};      // never, 虽然没有代码提示, 但类型为`void`的值是不存在的
-```
-
 
 ### **`Parameters<Type>`** {#parameters}
 获取函数类型的参数类型, 返回一个元组类型
@@ -474,9 +382,6 @@ type T0 = Parameters<(a: string, b: number) => string>;  // [string, number]
 
 #### 源代码
 ```typescript
-/**
- * Obtain the parameters of a function type in a tuple
- */
 type Parameters<T extends (...args: any) => any> = T extends (...args: infer P) => any ? P : never;
 ```
 
@@ -509,35 +414,20 @@ type T3 = ConstructorParameters<any>;                  // unknown[]
 
 #### 源代码
 ```typescript
-/**
- * Obtain the parameters of a constructor function type in a tuple
- */
-type ConstructorParameters<T extends abstract new (...args: any) => any> = T extends abstract new (...args: infer P) => any ? P : never;
+type ConstructorParameters<T extends new (...args: any) => any> = T extends new (...args: infer P) => any ? P : never;
 ```
 
 #### 实现原理
 ::: tip
-`new (...args: any) => any`表示任意构造函数类型, 类似Java中的Class类, 也就是`class`类型, 这里加上`abstract`是为了包含`abstract class`, 保证`ConstructorParameters`也能用于获取抽象类  
-  
-实际上, `new (...args: any) => any`是`abstract new (...args: any) => any`的子类型
+`new (...args: any) => any`表示任意构造函数类型, 类似Java中的Class类, 也就是`class`类型
 :::
 
 ```typescript
-type BF = abstract new (...args: any) => any;
 type F = new (...args: any) => any;
 
-abstract class A {}
-class B {}
-
 let f: F;
-f = B;
-f = A;               // ERROR
-f = function() {};   // ERROR
-
-let bf: BF;
-bf = B;
-bf = A;
-bf = function() {};  // ERROR
+f = class A {};
+f = function B() {}; // ERROR
 ```
 
 ### **`ReturnType<Type>`** {#returntype}
@@ -550,9 +440,6 @@ type T0 = ReturnType<() => string>;  // string
 
 #### 源代码
 ```typescript
-/**
- * Obtain the return type of a function type
- */
 type ReturnType<T extends (...args: any) => any> = T extends (...args: any) => infer R ? R : any;
 ```
 
@@ -583,10 +470,7 @@ const instance = createInstance(A);
 
 #### 源代码
 ```typescript
-/**
- * Obtain the return type of a constructor function type
- */
-type InstanceType<T extends abstract new (...args: any) => any> = T extends abstract new (...args: any) => infer R ? R : any;
+type InstanceType<T extends new (...args: any) => any> = T extends new (...args: any) => infer R ? R : any;
 ```
 
 #### 实现原理
@@ -614,10 +498,7 @@ function numberToString(n: ThisParameterType<typeof toHex>) {
 
 #### 源代码
 ```typescript
-/**
- * Extracts the type of the 'this' parameter of a function type, or 'unknown' if the function type has no 'this' parameter.
- */
-type ThisParameterType<T> = T extends (this: infer U, ...args: never) => any ? U : unknown;
+type ThisParameterType<T> = T extends (this: infer U, ...args: any[]) => any ? U : unknown;
 ```
 
 #### 实现原理
@@ -641,10 +522,7 @@ console.log(fiveToHex());
 
 #### 源代码
 ```typescript
-/**
- * Removes the 'this' parameter from a function type.
- */
-type OmitThisParameter<T> = unknown extends ThisParameterType<T> ? T : T extends (...args: infer A) => infer R ? (...args: A) => R : T;
+type OmitThisParameter<T> = unknown extends ThisParameterType<T> ? T : T extends (this: any, ...args: infer P) => infer R ? (...args: P) => R : T;
 ```
 
 #### 实现原理
@@ -658,38 +536,20 @@ type OmitThisParameter<T> = unknown extends ThisParameterType<T> ? T : T extends
 :::
 
 ::: tip
-`any`和`unknown`都是`top type`, `unknown`是更安全版本的`any`, 而类型声明为`top type`的变量, 可以把任何类型的值赋给它    
-但是`any`类型的值也可以赋给任何其他类型, 除了`never`
-:::
-
-```typescript
-declare const anyValue: any;
-let num: number = anyValue;
-let str: string = anyValue;
-let unknownValue: unknown = anyValue;
-let nullValue: null = anyValue;
-let undefinedValue: undefined = anyValue;
-let voidValue: void = anyValue;
-let neverValue: never = anyValue;     // ERROR
-```
-::: tip
+`any`和`unknown`都是`top type`, `unknown`是更安全版本的`any`, 而类型声明为`top type`的变量, 可以把任何类型的值赋给它  
 `never`则是`bottom type`, 也就是说`never`是任何类型的子类型
 :::
+
+但是TypeScript中`never`类型的行为和`bottom type`不一样, `never`类型的变量可以赋值给任何类型的变量, 这一点更像是`top type`的行为
 
 ```typescript
 declare const neverValue: never;
 let num: number = neverValue;
 let str: string = neverValue;
 let anyValue: any = neverValue;
-let unknownValue: unknown = neverValue;
-let nullValue: null = neverValue;
-let undefinedValue: undefined = neverValue;
-let voidValue: void = neverValue;
 ```
 
-::: warning
 理论上`T extends never`永远为`false`, 但是TypeScript中有一些特例:
-:::
 
 ```typescript
 type Never<T> = T extends never ? string : number;
@@ -708,6 +568,7 @@ type Never1 = Never<never>;         // never
 
 ### **`ThisType<Type>`** {#thistype}
 `ThisType`实际上是一个`interface`, 用于标记`this`类型
+
 
 #### 使用
 :::warning
@@ -735,7 +596,6 @@ let obj = makeObject({
     },
   },
 });
-
  
 obj.x = 10;
 obj.y = 20;
@@ -744,10 +604,7 @@ obj.moveBy(5, 5);
 
 #### 源代码
 ```typescript
-/**
- * Marker for contextual 'this' type
- */
-interface ThisType<T> { }
+interface ThisType<T> {}
 ```
 
 #### 实现原理
@@ -756,9 +613,100 @@ interface ThisType<T> { }
 :::
 
 ## **Intrinsic String Manipulation Types** {#intrinsic-string-manipulation-types}
-TypeScript提供了一些内置的字符串操作类型, 用于操作字符串类型, 由`tsc`编译器内部实现(`intrinsic`)
+TypeScript提供了一些内置的字符串操作类型, 用于操作字符串类型
+
 
 ### **`Uppercase<StringType>`** {#uppercase}
+
 ### **`Lowercase<StringType>`** {#lowercase}
+
 ### **`Capitalize<StringType>`** {#capitalize}
+
 ### **`Uncapitalize<StringType>`** {#uncapitalize}
+
+## 其他通用类型
+
+## DOM相关类型
+
+
+## Syntax Highlighting
+
+VitePress provides Syntax Highlighting powered by [Shiki](https://github.com/shikijs/shiki), with additional features like line-highlighting:
+
+**Input**
+
+````
+```js{4}
+export default {
+  data () {
+    return {
+      msg: 'Highlighted!'
+    }
+  }
+}
+```
+````
+
+**Output**
+
+```js{4}
+export default {
+  data () {
+    return {
+      msg: 'Highlighted!'
+    }
+  }
+}
+```
+
+## Custom Containers
+
+**Input**
+
+```md
+::: info
+This is an info box.
+:::
+
+::: tip
+This is a tip.
+:::
+
+::: warning
+This is a warning.
+:::
+
+::: danger
+This is a dangerous warning.
+:::
+
+::: details
+This is a details block.
+:::
+```
+
+**Output**
+
+::: info
+This is an info box.
+:::
+
+::: tip
+This is a tip.
+:::
+
+::: warning
+This is a warning.
+:::
+
+::: danger
+This is a dangerous warning.
+:::
+
+::: details
+This is a details block.
+:::
+
+## More
+
+Check out the documentation for the [full list of markdown extensions](https://vitepress.dev/guide/markdown).

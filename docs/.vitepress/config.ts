@@ -1,14 +1,19 @@
 import { defineConfig, DefaultTheme } from 'vitepress'
 import { SearchPlugin } from 'vitepress-plugin-search';
+import { VitePWA } from 'vite-plugin-pwa';
 
 type Articles = DefaultTheme.NavItem & DefaultTheme.SidebarItem;
 
 const articles: Articles[] = [
+  { text: 'AddreeForm', link: '/address-form/',
+    collapsed: true,
+  },
   { text: 'TypeScript',
     collapsed: true,
     items: [
-      { text: 'Utility类型', link: '/typescript/utility-types' },
-      { text: '重载函数的类型', link: '/typescript/overload-function-types' },
+      { text: 'TypeScript Utility类型大全', link: '/typescript/utility-types' },
+      { text: 'TypeScript重载函数的参数和返回值类型', link: '/typescript/overload-function-types' },
+      { text: '类型运算中的lodash: "type-fest"', link: '/typescript/type-fest' },
     ]
   },
   {
@@ -69,6 +74,7 @@ export default defineConfig({
   vite: { 
     plugins: [
       SearchPlugin(options),
+      VitePWA(),
     ],
   },
 });
