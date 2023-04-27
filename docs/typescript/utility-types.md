@@ -9,9 +9,6 @@ outline: [2, 3]
 <a href="https://www.typescriptlang.org/docs/handbook/release-notes/typescript-5-0.html" alt="TypeScript">
   <img src="https://img.shields.io/badge/TypeScript-v5.0.4-blue?style=for-the-badge&logo=typescript" /></a>
 
----------------------------------------
-
-
 基于TypeScript 5.0.4, 梳理一下通用的Utility Types, 点评实现原理, 帮助大家加深对TypeScript类型运算的理解
 
 ## 常用类型 {#common}
@@ -441,7 +438,7 @@ type AB = {
 :::
 
 ::: tip
-这里利用了`{}`类型的特殊之处, 所有类型都是`{}`类型的子类型, 除了`void` `null` `undefined`, 并且`{}`和这三个类型是互斥的, 不存在既是`null`又是`{}`(空对象)的类型, 可以参考以下代码  
+这里利用了`{}`(**empty object type**)类型的特殊之处, 所有类型都是`{}`类型的子类型, `void` `null` `undefined`除外, 并且`{}`和这三个类型是互斥的, 不存在既是`null`又是`{}`(空对象)的类型, 可以参考以下代码  
 :::
 
 ```typescript

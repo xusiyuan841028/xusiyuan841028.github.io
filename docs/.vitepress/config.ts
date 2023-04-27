@@ -5,15 +5,16 @@ import { VitePWA } from 'vite-plugin-pwa';
 type Articles = DefaultTheme.NavItem & DefaultTheme.SidebarItem;
 
 const articles: Articles[] = [
-  { text: 'AddreeForm', link: '/address-form/',
-    collapsed: true,
-  },
+  // { text: 'AddreeForm', link: '/address-form/',
+    // collapsed: true,
+  // },
   { text: 'TypeScript',
     collapsed: true,
     items: [
       { text: 'TypeScript Utility类型大全', link: '/typescript/utility-types' },
       { text: 'TypeScript重载函数的参数和返回值类型', link: '/typescript/overload-function-types' },
-      { text: '类型运算中的lodash: "type-fest"', link: '/typescript/type-fest' },
+      // { text: 'TypeScript Compiler API', link: '/typescript/compiler-api' },
+      // { text: '类型运算的lodash库 - type-fest', link: '/typescript/type-fest' },
     ]
   },
   {
@@ -26,14 +27,20 @@ const articles: Articles[] = [
 ];
 
 //default options
+const Segment = require('segment');
+const segment = new Segment();
+segment.useDefault();
+
 const options = {
   previewLength: 62,
   buttonLabel: "Search",
   placeholder: "Search docs",
   allow: [],
   ignore: [],
-  encode: false,
-  tokenize: 'full' as 'full'
+  // encode: false,
+  // tokenize: 'full' as 'full',
+  encode: (str) => segment.doSegment(str, {simple: true}),
+  tokenize: 'forward' as 'forward',
 };
 
 

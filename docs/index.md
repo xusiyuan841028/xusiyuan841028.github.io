@@ -20,14 +20,12 @@ features:
     details: 总结梳理一下TypeScript 5.0中所有可用的Utility Types和用途, 以及其实现原理, 帮助你实现"类型自由"...
     link: /typescript/utility-types 
     linkText: READ MORE 
-
   - icon:
       src: /logo/typescript.svg
     title: 重载函数的类型 
     details: 在TypeScript中, 重载函数类型是如何定义和实现的呢? 以及如何获得重载函数的参数类型和返回值类型呢?
-    link: /typescript/overlaod-function-types 
+    link: /typescript/overload-function-types 
     linkText: READ MORE 
-
   - icon:
       src: /logo/promise.svg
       title: Promise的使用技巧
