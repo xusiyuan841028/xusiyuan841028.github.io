@@ -151,7 +151,7 @@ type LazyPerson = {
 ```
 
 ### **`Required<Type>`** {#required}
-将类型的所有属性变为必选
+将类型的所有属性变为必需
 
 #### 使用
 ```typescript
@@ -181,7 +181,7 @@ type Required<T> = {
 
 #### 实现原理
 ::: tip
-`readonly` and `?`是两种类型修饰符, 在类型映射(mapping)时用`+`和`-`前缀可以增删修饰符, 如果前缀不存在, 默认为`+`
+`readonly` and `?`是两种类型属性修饰符(modifier), 在类型映射(mapping)时用`+`和`-`前缀可以增删修饰符, 如果前缀不存在, 默认为`+`
 :::
 
 ```typescript
@@ -402,11 +402,11 @@ type NonNullable<T> = T & {};
 
 #### 实现原理
 ::: tip
-这里着重解释一下`&`类型操作符, 也就是所谓的交集, 示例如下; 很多人最初不理解为啥A和B的交集类型是合并属性, 不是做交集么?  
-  
-实际上, 从集合论的观点, `A & B`生成的新类型是A和B的子集, 也就是A和B子类型, 或者说A包含AB且B包含AB  
+这里着重解释一下`&`类型操作符, 也就是所谓的交集类型, 很多人最初不理解为啥A和B的交集类型是合并属性, 不是做交集么?    
 
-所以`AB extends A` `AB extends B`都是`true`, 那么当然要把`A`和`B`的属性都合并起来, 否则无法满足即是`A`的子集, 又是`B`的子集  
+实际上, 从集合论的观点, `A & B`生成的新类型是A和B的子集, 也就是A和B子类型, 或者说A包含AB且B包含AB;    
+
+所以`AB extends A` `AB extends B`都是`true`, 那么当然要把`A`和`B`的属性都合并起来, 否则无法满足即是`A`的子类型, 又是`B`的子类型;  
 :::
 
 ```typescript
@@ -514,7 +514,7 @@ type ConstructorParameters<T extends abstract new (...args: any) => any> = T ext
 
 #### 实现原理
 ::: tip
-`new (...args: any) => any`表示任意构造函数类型, 类似Java中的Class类, 也就是`class`类型, 这里加上`abstract`是为了包含`abstract class`, 保证`ConstructorParameters`也能用于获取抽象类  
+`new (...args: any) => any`表示任意构造函数类型, 类似Java中的Class类, 也就是`class`类型, 这里加上`abstract`是为了包含`abstract class`, 保证`ConstructorParameters`也能用于获取抽象类的构造器参数  
   
 实际上, `new (...args: any) => any`是`abstract new (...args: any) => any`的子类型
 :::
@@ -689,13 +689,13 @@ let voidValue: void = neverValue;
 :::
 
 ```typescript
-type Never<T> = T extends never ? string : number;
-type Number1 = Never<boolean>;      // number
-type Number2 = Never<string>;       // number
-type Number3 = Never<void>;         // number
-type Number4 = Never<unknown>;      // number
-type Number5 = Never<{}>;           // number
-type NumberOrString = Never<any>;   // number | string
+type Never<T> = T extends never ? true : false;
+type Number1 = Never<boolean>;      // false 
+type Number2 = Never<string>;       // false 
+type Number3 = Never<void>;         // false 
+type Number4 = Never<unknown>;      // false 
+type Number5 = Never<{}>;           // false 
+type NumberOrString = Never<any>;   // false | true = boolean
 type Never1 = Never<never>;         // never
 ```
 

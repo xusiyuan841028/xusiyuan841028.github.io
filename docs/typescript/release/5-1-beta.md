@@ -167,7 +167,7 @@ box.value = true;
 console.log(box.value.toUpperCase());
 ```
 
-最初, 我们需要`get`的类型是`set`类型的子类型, 只意味着以下赋值语句是合法的:
+最初, 我们需要`get`的类型是`set`类型的子类型, 这意味着以下赋值语句是合法的:
 
 ```typescript
 box.value = box.value; // `string` extends `string | number | boolean`
@@ -211,7 +211,7 @@ class SafeBox {
 
 ## 解耦JSX元素和JSX Tag类型之间的类型检查 {#jsx}
 
-过去在JSX和TypeScript一起使用的一个痛点是需要每种JSX元素Tag的类型.
+过去在JSX和TypeScript一起使用的一个痛点是需要知道每种JSX元素Tag的类型.
 
 一个JSX元素如下:
 
