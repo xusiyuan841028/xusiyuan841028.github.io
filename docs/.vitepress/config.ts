@@ -9,17 +9,24 @@ const articles: Articles[] = [
     // collapsed: true,
   // },
   { text: 'TypeScript',
-    collapsed: true,
+    // collapsed: true,
     items: [
-      { text: 'TypeScript Utility类型大全', link: '/typescript/utility-types' },
       { text: 'TypeScript重载函数的参数和返回值类型', link: '/typescript/overload-function-types' },
+      { text: 'TypeScript Utility类型大全', link: '/typescript/utility-types' },
+      { 
+        text: '版本发布 - TypeScript 5.0',
+        collapsed: true,
+        items: [
+          { text: 'TypeScript 5.1 Beta', link: '/typescript/release/5-1-beta' },
+        ]
+      }
       // { text: 'TypeScript Compiler API', link: '/typescript/compiler-api' },
       // { text: '类型运算的lodash库 - type-fest', link: '/typescript/type-fest' },
     ]
   },
   {
     text: 'JavaScript',
-    collapsed: true,
+    // collapsed: true,
     items: [
       { text: 'Promise的使用技巧', link: '/javascript/promise-tips' },
     ]

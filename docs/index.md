@@ -16,6 +16,12 @@ hero:
 features:
   - icon:
       src: /logo/typescript.svg
+    title: Announcing TypeScript 5.1 Beta 
+    details: TypeScript 5.1 Beta版本的变化 
+    link: /typescript/release/5-1-beta.md
+    linkText: READ MORE 
+  - icon:
+      src: /logo/typescript.svg
     title: Utility类型 
     details: 总结梳理一下TypeScript 5.0中所有可用的Utility Types和用途, 以及其实现原理, 帮助你实现"类型自由"...
     link: /typescript/utility-types 
