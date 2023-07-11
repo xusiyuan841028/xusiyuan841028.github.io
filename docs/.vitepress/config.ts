@@ -14,10 +14,12 @@ const articles: Articles[] = [
       { text: 'TypeScript重载函数的参数和返回值类型', link: '/typescript/overload-function-types' },
       { text: 'TypeScript Utility类型大全', link: '/typescript/utility-types' },
       { 
-        text: '版本发布 - TypeScript 5.0',
+        text: '版本发布 - TypeScript 5.2',
         collapsed: true,
         items: [
-          { text: 'TypeScript 5.1 Beta', link: '/typescript/release/5-1-beta' },
+          { text: 'TypeScript 5.2 Beta', link: '/typescript/release/5-2' },
+          { text: 'TypeScript 5.1', link: '/typescript/release/5-1' },
+          { text: 'TypeScript 5.0', link: '/typescript/release/5-0' },
         ]
       }
       // { text: 'TypeScript Compiler API', link: '/typescript/compiler-api' },
@@ -28,9 +30,17 @@ const articles: Articles[] = [
     text: 'JavaScript',
     // collapsed: true,
     items: [
+      { text: 'JavaScript metaprogramming', link: '/javascript/metaprogramming' },
       { text: 'Promise的使用技巧', link: '/javascript/promise-tips' },
     ]
   },
+  // {
+    // text: 'Rust',
+    // collapsed: true,
+    // items: [
+      // { text: '基于Neovim搭建Rust开发环境2023版', link: '/rust/ide' },
+    // ]
+  // },
 ];
 
 //default options

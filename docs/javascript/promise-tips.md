@@ -105,13 +105,7 @@ setTimeout(() => {
 function timeout<T extends (...args: any[]) => Promise<any>>(f: T, time: number, reason?: any | ((args: Parameters<T>) => any)): (...args: Parameters<T>) => Promise<Awaited<ReturnType<T>>> {
   type R = Awaited<ReturnType<T>>;
   return (...args: Parameters<T>): Promise<R> => new Promise((resolve, reject) => {
-    setTimeout(() => {
-      let r: any = reason;
-      if (reason && typeof reason === 'function') {
-        r = reason.call(null, args);
-      }
-      reject(r);
-    }, time);
+    setTimeout(() => reject(reason && typeof reason === 'function' ? reason.call(null, args) : reason), time);
     f(...args).then(resolve);
   });
 }
@@ -149,12 +143,12 @@ function retry<T extends (...args: any[]) => Promise<any>>(f: T, times: number):
 
 // TESTING CODE!!!
 const f = retry(asyncRun, 2);
-f(2, false).then((res) => console.log('success: ', res)).catch(r => console.log('fail: ', r));
+f(2, 2, false).then((res) => console.log('success: ', res)).catch(r => console.log('fail: ', r));
 ```
 
 ## limit - 让一个async函数的并发调用受限 {#limit}
 
-假设并发数为5, 一个async函数, 同时调用10次, 实际只调用5次, 每次调用被fulfill后, 再开始执行一次被pending的调用, 知道所有调用完成  
+假设并发数为5, 一个async函数, 同时调用10次, 实际只调用5次, 每当有一次调用被fulfill后, 再开始执行一次被pending的调用, 直到所有调用完成  
 
 ::: tip
 利用手动`promise`来调度函数调用  

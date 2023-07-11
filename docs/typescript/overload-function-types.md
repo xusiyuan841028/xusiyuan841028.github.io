@@ -64,14 +64,14 @@ interface OverloadFn {
 
 ```typescript
 type OverloadedReturnType<T> = 
-  T extends { (...args: any[]) : infer R; (...args: any[]) : infer R; (...args: any[]) : infer R ; (...args: any[]) : infer R; (...args: any[]) : infer R; (...args: any[]) : infer R; (...args: any[]) : infer R; (...args: any[]) : infer R } ? R  :
-  T extends { (...args: any[]) : infer R; (...args: any[]) : infer R; (...args: any[]) : infer R ; (...args: any[]) : infer R; (...args: any[]) : infer R; (...args: any[]) : infer R; (...args: any[]) : infer R } ? R :
-  T extends { (...args: any[]) : infer R; (...args: any[]) : infer R; (...args: any[]) : infer R ; (...args: any[]) : infer R; (...args: any[]) : infer R; (...args: any[]) : infer R } ? R :
-  T extends { (...args: any[]) : infer R; (...args: any[]) : infer R; (...args: any[]) : infer R ; (...args: any[]) : infer R; (...args: any[]) : infer R } ? R :
-  T extends { (...args: any[]) : infer R; (...args: any[]) : infer R; (...args: any[]) : infer R ; (...args: any[]) : infer R } ? R :
-  T extends { (...args: any[]) : infer R; (...args: any[]) : infer R; (...args: any[]) : infer R } ? R  :
-  T extends { (...args: any[]) : infer R; (...args: any[]) : infer R } ? R :
-  T extends { (...args: any[]) : infer R; } ? R : any;
+  T extends { (...args: any[]): infer R; (...args: any[]): infer R; (...args: any[]): infer R; (...args: any[]): infer R; (...args: any[]): infer R; (...args: any[]): infer R; (...args: any[]): infer R; (...args: any[]): infer R; } ? R  :
+  T extends { (...args: any[]): infer R; (...args: any[]): infer R; (...args: any[]): infer R; (...args: any[]): infer R; (...args: any[]): infer R; (...args: any[]): infer R; (...args: any[]): infer R; } ? R :
+  T extends { (...args: any[]): infer R; (...args: any[]): infer R; (...args: any[]): infer R; (...args: any[]): infer R; (...args: any[]): infer R; (...args: any[]): infer R; } ? R :
+  T extends { (...args: any[]): infer R; (...args: any[]): infer R; (...args: any[]): infer R; (...args: any[]): infer R; (...args: any[]): infer R; } ? R :
+  T extends { (...args: any[]): infer R; (...args: any[]): infer R; (...args: any[]): infer R; (...args: any[]): infer R } ? R :
+  T extends { (...args: any[]): infer R; (...args: any[]): infer R; (...args: any[]): infer R; } ? R  :
+  T extends { (...args: any[]): infer R; (...args: any[]): infer R; } ? R :
+  T extends { (...args: any[]): infer R; } ? R : any;
 ```
 
 我们尝试着使用一下, 结果非常完美!
@@ -114,7 +114,6 @@ type Return = ReturnTypes<{ get(): string; pop(): number}>;
 <p>
   <img src="/image/Screenshot20230424-1.png" alt="" style="border-radius:8px; border: 2px solid var(--vp-button-brand-border);">
 </p>
-
 <br/>
 
 但`infer`右值类型是重载函数的`parameter type`时, 却是采用`intersection type`, 所以`OverloadedParameters<T>`得到的结果是`void & string & number & [string, number]`
@@ -134,6 +133,62 @@ type Params = ParameterTypes<{ set(a: string): any; push(b: number): any}>;
 > https://github.com/microsoft/TypeScript/issues/14107   
 > https://github.com/microsoft/TypeScript/issues/32164   
 
-所以, 暂时无法实现`OverloadedParameters`啦 ......
+所以首先要把重载函数类型转换成其他类型, 例如函数元组(Tuple), 以下代码可以支持最多8次重载签名;
+
+```typescript
+type OverloadsToTuple8<T> = T extends { (...args: infer P1): infer R1; (...args: infer P2): infer R2; (...args: infer P3): infer R3; (...args: infer P4): infer R4; (...args: infer P5): infer R5; (...args: infer P6): infer R6; (...args: infer P7): infer R7; (...args: infer P8): infer R8; } 
+    ? [ (...args: P1) => R1, (...args: P2) => R2, (...args: P3) => R3, (...args: P4) => R4, (...args: P5) => R5, (...args: P6) => R6, (...args: P7) => R7, (...args: P8) => R8 ] 
+    : OverloadsToTuple7<T>;
+
+type OverloadsToTuple7<T> = T extends { (...args: infer P1): infer R1; (...args: infer P2): infer R2; (...args: infer P3): infer R3; (...args: infer P4): infer R4; (...args: infer P5): infer R5; (...args: infer P6): infer R6; (...args: infer P7): infer R7; } 
+    ? [ (...args: P1) => R1, (...args: P2) => R2, (...args: P3) => R3, (...args: P4) => R4, (...args: P5) => R5, (...args: P6) => R6, (...args: P7) => R7 ] 
+    : OverloadsToTuple6<T>;
+
+type OverloadsToTuple6<T> = T extends { (...args: infer P1): infer R1; (...args: infer P2): infer R2; (...args: infer P3): infer R3; (...args: infer P4): infer R4; (...args: infer P5): infer R5; (...args: infer P6): infer R6; }
+    ? [ (...args: P1) => R1, (...args: P2) => R2, (...args: P3) => R3, (...args: P4) => R4, (...args: P5) => R5, (...args: P6) => R6 ] 
+    : OverloadsToTuple5<T>;
+
+type OverloadsToTuple5<T> = T extends { (...args: infer P1): infer R1; (...args: infer P2): infer R2; (...args: infer P3): infer R3; (...args: infer P4): infer R4; (...args: infer P5): infer R5; }
+    ? [ (...args: P1) => R1, (...args: P2) => R2, (...args: P3) => R3, (...args: P4) => R4, (...args: P5) => R5 ] 
+    : OverloadsToTuple4<T>;
+
+type OverloadsToTuple4<T> = T extends { (...args: infer P1): infer R1; (...args: infer P2): infer R2; (...args: infer P3): infer R3; (...args: infer P4): infer R4; } 
+    ? [ (...args: P1) => R1, (...args: P2) => R2, (...args: P3) => R3, (...args: P4) => R4 ] : OverloadsToTuple3<T>;
+
+type OverloadsToTuple3<T> = T extends { (...args: infer P1): infer R1; (...args: infer P2): infer R2; (...args: infer P3): infer R3; }
+    ? [ (...args: P1) => R1, (...args: P2) => R2, (...args: P3) => R3, ] : OverloadsToTuple2<T>;
+
+type OverloadsToTuple2<T> = T extends { (...args: infer P1): infer R1; (...args: infer P2): infer R2; } 
+    ? [ (...args: P1) => R1, (...args: P2) => R2 ]
+    : OverloadsToTuple1<T>;
+
+type OverloadsToTuple1<T> = T extends { (...args: infer P1): infer R1; } ? [ (...args: P1) => R1 ] : never;
+
+type OverloadsToTuple<T> = OverloadsToTuple8<T>;
+```
+
+简单测试后我们发现, 重载次数小于8时, 会出现重复的`(...args: unknown[]) => unknown`签名:
+
+<p>
+  <img src="/image/Screenshot20230424-2.png" alt="" style="border-radius:8px; border: 2px solid var(--vp-button-brand-border);">
+</p>
+
+所以, 尝试过滤多余的元组项:
+```typescript
+type FilterUnknowSignature<T extends unknown[]> = T extends [] ? [] :
+    T extends [infer H, ...infer R] 
+        ? ((...args: unknown[]) => unknown) extends H
+            ? FilterUnknowSignature<R> 
+            : [H, ...FilterUnknowSignature<R>] 
+        : T
+
+type OverloadsToTuple<T> = FilterUnknowSignature<OverloadsToTuple8<T>>;
+
+type Tuple = OverloadsToTuple<type fn>;
+```
+但是发现`() => void`签名也被过滤了....
+
+
+
 
 

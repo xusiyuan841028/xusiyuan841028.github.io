@@ -15,10 +15,16 @@ hero:
       link: https://github.com/xusiyuan841028/xusiyuan841028.github.io
 features:
   - icon:
+      src: /logo/javascript.svg
+      title: JavaScript Metaprogramming 
+    details: TypeScript官方推荐的JavaScript元编程教材, 基于2022-03版本Decorator API详细讲解装饰器的底层机制和使用技巧
+    link: /javascript/metaprogramming
+    linkText: READ MORE 
+  - icon:
       src: /logo/typescript.svg
     title: Announcing TypeScript 5.1 Beta 
-    details: TypeScript 5.1 Beta版本的变化 
-    link: /typescript/release/5-1-beta.md
+    details: TypeScript 5.1 Beta 新版本的变化 
+    link: /typescript/release/5-1-beta
     linkText: READ MORE 
   - icon:
       src: /logo/typescript.svg
@@ -38,4 +44,11 @@ features:
     details: 研究一下Promise的各种奇技淫巧, 例如并发控制, 取消, 重试, 超时, 节流, 防抖 ...
     link: /javascript/promise-tips 
     linkText: READ MORE 
+
+# - icon:
+#     src: /logo/rust.svg
+#     title: 基于Neovim搭建Rust开发环境2023版 
+#   details: 基于Zsh和Neovim搭建一套完整的Rust语言终端开发环境
+#   link: /rust/ide
+#   linkText: READ MORE 
 ---
